@@ -1,2 +1,239 @@
-# Siamese-Neural-Networks-Using-One-Shot-Learning
-Goal: Facial Recognition
+# Siamese-NN-Using-One-Shot-Learning
+
+## Purpose of this work:
+Enabling students to experiment with building a convolutional neural net, using it on a real-world dataset and problem. In addition to practical knowledge in the “how to” of building the network, an additional goal is the integration of useful logging tools for gaining better insight into the training process. Finally, the students are expected to read, understand and (loosely) implement a scientific paper.
+
+link to the paper: https://www.cs.cmu.edu/~rsalakhu/papers/oneshot1.pdf
+
+## Task: Facial Recognition
+
+## Table of Contents:
+1. Data Analysis
+2. Project Structure
+3. Model Architecture
+4. Model Initialization
+5. Hyperparameters
+6. Stopping Conditions
+7. Experiments
+8. Results and Evaluation
+9. Conclusions
+
+## Part 1: Data Analysis
+The raw data we received as part of the assignment is actually compressed images inside a zip file and txt files. After reading the readme file of the Labeled Faces in the Wild dataset and extracting the files, the data can be described as follows:
+
+- The data is actually the images, sized 250x250 pixels, so they are divided by people. Each person has one or more images, which are numbered starting from 0001 (0002, 0003 and so on).
+- The training and test sets are actually defined by the txt files.
+
+Structure of the txt file:
+On the first line - a number describing the number of records in the set of each type - match (matching images of the same person) and mismatch (two different images of different people).
+After that, there are records according to the above number for each type, so that the structure of each record is:
+
+A record describing a match:
+person_name img1_num img2_num
+
+A record describing a mismatch: 
+person1_name img1_num person2_name img2_num
+
+Therefore, we performed the following preprocessing on the data:
+- Resized the image to 105 x 105 pixels. In addition, for the training set we also added the image channels: 1.
+- Converted the images into matrices containing the pixel values - the images will enter the model we build later in this format.
+
+We will note a few basic features of the data:
+- Total number of images: 13233
+- Number of records in the training set: 2200  
+- Number of matching image records: 1100
+- Number of non-matching image records: 1100
+- Number of records in the test set: 1000
+- Number of matching image records: 500
+- Number of non-matching image records: 500
+
+Here are examples of the data, from the training set:
+
+- A record describing a match between two images (same person in the image):
+Aaron_Peirsol 1 2
+
+![image](https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/20f77b15-8b31-48a8-aecd-be857d023641)
+![image](https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/8f582d56-0773-403e-8807-070dd055923d)
+
+- A record describing a mismatch between two images (2 different people in each image):
+AJ_Cook 1 Marsha_Thomason 1  
+
+![image](https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/9f7a3a1c-8c8f-432a-9e76-caf50ba24f76)
+![image](https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/894b19dc-0a4a-436f-8abc-033cdfe99e76)
+
+## Part 2: Project Structure
+This part of the report is intended to give an overview of the files and folders in the project. We will expand on their contents later.
+
+Folders:
+NOTE - we didnt attached this directories.
+data directory - A folder containing the images themselves, the txt files we downloaded and the pkl files we created (which contain the images after preprocessing).
+logs directory - In addition to runtime prints and saving results and graphs, we chose to add a folder that will save log records at certain important points so that we can trace back and try to understand the process the model went through.
+results directory - A folder that will contain the results of the experiments and the graphs describing the training and testing processes.
+
+Files:
+
+load_data.py - This file is responsible for loading the data, preprocessing it, and then saving the data in pkl files. It also contains an initial analysis of the data.
+
+logger.py - Contains initialization of the logger's logging settings according to the format we chose (wherever we chose to use the logging option, we initialized it using this file).
+
+requirements.txt - A file with the requirements of the packages we used, so that if someone wants to run the project on their machine, they can make sure they have all the required packages.
+
+siamese_network.py - A class that implements the model of the network, also contains weight initialization, building the CNN architecture, and performing forward as written in the paper.
+
+trainer.py - Contains a class built for training and testing. We chose to separate the actual training stage from running the experiments in order to create order, clarity, and convenience (we did not want the experiment run file to be too cluttered or vice versa). It is important to note that in this file, we load the data from the pkl files, and the prediction on the test set is also performed.
+
+run_experiments.py - A file for running experiments. It contains a "grid search" that runs combinations of hyperparameters of our choice.
+
+## Part 3: Model Architecture
+The model can be divided into two parts that connect during the forward phase. The first part is the convolutional network, and the second is the "prediction" network. In general, our implementation is based on a single convolutional network, which is run twice during prediction to obtain two temporary outputs, and then a distance calculation is performed between these outputs, and the result of the calculation is input into the second part of the network - the "prediction" network.
+
+We logically divided the structure of the convolutional network into "blocks":
+
+- Block 1:
+    - Input size: 105x105 pixel images. Each image has a single channel.
+    - Components: First, there is a convolutional layer with 64 kernels, where each kernel is 10x10.
+    After the kernel operation, 96x96 pixel images are obtained (multiplied by the number of kernels - 64).
+    Finally, there is a normalization layer, an activation layer (ReLU), and a max pooling layer.
+    - Output size: 48x48 pixel images, 64 channels per image.
+
+- Block 2:
+    - Input size: 48x48 pixel images, 64 channels per image (output size of Block 1).
+    - Components: First, there is a convolutional layer with 128 kernels, where each kernel is 7x7.
+    After the kernel operation, 42x42 pixel images are obtained (multiplied by the number of kernels - 128).
+    Finally, there is a normalization layer, an activation layer (ReLU), and a max pooling layer.
+    - Output size: 21x21 pixel images, 128 channels per image.
+
+- Block 3:
+    - Input size: 21x21 pixel images, 128 channels per image (output size of Block 2).
+    - Components: First, there is a convolutional layer with 128 kernels, where each kernel is 4x4.
+    After the kernel operation, 18x18 pixel images are obtained (multiplied by the number of kernels - 128).
+    Finally, there is a normalization layer, an activation layer (ReLU), and a max pooling layer.
+    - Output size: 9x9 pixel images, 128 channels per image.
+
+- Block 4:
+    - Input size: 9x9 pixel images, 128 channels per image (output size of Block 3).
+    - Components: First, there is a convolutional layer with 256 kernels, where each kernel is 4x4.
+    After the kernel operation, 6x6 pixel images are obtained (multiplied by the number of kernels - 256).
+    Finally, there is a normalization layer, an activation layer (ReLU), and no pooling layer.
+    - Output size: 6x6 pixel images, 256 channels per image.
+
+- Block 5:
+    The last block in the convolutional network is a channel flattening block (flatten), where the flattening creates a vector of size 6*6*256 = 9216. We connect a dense layer of size 4096 to this layer, and then we perform a sigmoid activation.
+
+Explanation of how the convolutional network integrates with the "prediction" network as part of the Siamese network model we built, and an explanation of the forward function:
+
+The input is essentially doubled - meaning two images.
+
+Components: Each input is separately entered into the convolutional network, and the output is saved separately for each.
+Then, using torch.abs, the "distance" (L1 distance) between these vectors is calculated (they are of the same size - 4096 on 1).
+After that, the L1_distance vector enters the "prediction" network.
+
+Output: The probability of a match between the input images.
+
+Note: We wrapped all the blocks and layers with nn.Sequential.
+
+Part 4: Model Initialization
+Model initialization refers to two aspects: setting the random seed and initializing the weights.
+
+- In order to fix the seed, we defined a value for it in a field of the model class. In addition, we ran the setup_seeds function, which initializes all the random generators for all the packages we use in the model: torch, random, numpy random.
+
+- For weight initialization, we used the setup_weights function which is called in the constructor. This function initializes weights based on the layer type: Conv/Linear. Initialization of convolutional layers is performed according to what is written in the paper, but we slightly modified the initial weights of the Linear layers in order to achieve better performance based on the runs we performed.
+
+## Part 5: Hyperparameters 
+Fixed Hyperparameters:
+- Validation set size: We chose to use a common size of 20%. In order to allow the model to train "more", we tried a set size of 15%, but we saw that there was no significant difference in the results.
+- Optimizer: We chose to use Adam. We performed a few individual experiments with an SGD optimizer, but we got consistently worse results for it.
+- Loss function: Binary Cross Entropy - according to the paper.
+
+Variable Hyperparameters:  
+
+- Batch size: We chose to examine sizes of 16 and 32 as opposed to the common (32 and 64), because the amount of data we have for training is relatively small (2200 records) and we wanted to allow the model to train more times in each epoch.
+
+- Learning rate: We used learning rates of 0.001 and 0.005.
+It is important to note that we used the StepLR scheduler object, where every 5 epochs we set the learning rate to be 95% of its current value: new_lr = old_lr * 0.95. This was with the idea that as we approach the optimum, we want the learning to be slower and more gradual and less volatile (volatility makes it difficult to converge).
+
+- Regularization coefficient: Out of concern for converging to overfitting, we thought to try using regularization. However, since the amount of data for training is small, we must also avoid underfitting, so we chose small values for this coefficient: [0.0, 0.0001, 0.0005]. 
+
+- Number of epochs: We chose to run different experiments for 15, 25, 50 epochs with the idea that on one hand we want the model to have enough time to train, and on the other hand, we don't want it to overtrain. This is especially since the amount of training data is small, and then the likelihood that in each epoch the model will validate on data it has already seen increases, and thus the risk of overfitting increases.
+
+- Dropout rate: Out of concern for converging to overfitting, we thought to use the option of dropping out some of the information passing through the network. However, as mentioned, the number of records for training is not large, so this concern is not significant, and accordingly, we chose to examine small values for this parameter [0.0, 0.2].
+
+## Part 6: Stopping Conditions
+
+As part of the training stage, we implemented a mechanism for early stopping of the training process, which works as follows:
+We defined a field in the trainer class called patience, which defines the number of consecutive epochs in which no improvement is seen in the validation accuracy.
+
+After each epoch, we checked whether there was an improvement in this metric, and if there was indeed an improvement, we reset the counter that is getting closer to 0 as there are no improvement steps.
+When the counter reaches 0, the training process stops.
+if validation accuracy improved (better than best epoch)
+    then reset patience counter
+else patience counter-=1
+
+As part of running the runs throughout the work, we saw that this condition stops the training process too early, before the training reaches its peak performance, and thereby hurts the quality of the model.
+It is possible that a more complex stopping condition would succeed in achieving better results along with shortening the training process time.
+
+## Part 7: Experiments
+During the work, we tried to build our code as modular as possible so that we could try as many parameters as possible. In practice, given the large number of parameters, we did not perform experiments for all combinations (it is possible to reach over 400 combinations when each parameter has 3 values to check).
+It is important to note that we ran all the experiments on the GPU available on one of our personal computers. This fact added to the fact that it was not possible to check all combinations in relevant times.
+
+Therefore, as a first step, we performed a general experiment after thinking and selecting parameters based on the results of individual runs we performed until this stage:
+
+[Table showing results of first set of 18 experiments with different hyperparameter combinations]
+
+After this general experiment, we continued to perform more focused experiments, after first narrowing down and fixing some parameters:
+
+Based on the results of the first experiment, we decided to fix the learning rate to 0.005.
+We decided to reduce the set of epoch options to [25, 50]. Our hypothesis was that 15 epochs are not enough for the model to learn well enough.
+
+At this stage, we ran an experiment that focused on finding the optimal value for the regularization coefficient from the set of options [0.0, 0.0001, 0.0005].
+
+[Table showing results of second set of 6 experiments varying regularization]
+
+The best results were obtained for experiments 1, 2 and 6. We will save the parameter values of these experiments and expand on the performance of the resulting models later.
+
+At this stage, we decided to "put aside" experiment #6 and its parameters, because we got similar results, but more stable ones, for experiments 1 and 2, where the only difference is in the number of epochs. 
+
+Therefore, we set the regularization coefficient to 0.
+
+In the next stage, we decided to examine additional parameters: batch size and dropout rate. We examined the following values for these parameters:
+batch size = [16, 32]  
+dropout rate = [0.0, 0.2]
+
+Also, since in the previous experiment we got similar results for 50 and 25 epochs (experiments 1 and 2 in the previous table), we decided to perform the next experiment for 25 epochs only.
+
+[Table showing results of third set of 4 experiments varying batch size and dropout]
+
+First, we can see that applying dropout in this experiment at a value of 0.2 worked well (experiments 2 and 4). We were surprised to see that a batch size of 16 brought the best results in this experiment (#2). It should be noted that in previous experiments we performed (before the first general experiment), we did not identify that this batch size brings better results than batch size = 32.
+
+We will save the parameter values of experiment #2 and expand on the performance of this model later.
+
+Part 8: Results and Evaluation
+We will present the five best performing models we obtained according to the Test Accuracy results.
+
+Model 1 - Test Accuracy = 0.743:
+[Shows model parameters, training metrics, validation metrics, test metrics]
+[Shows training accuracy curve, validation accuracy curve, training loss curve]
+
+Model 2 - Test Accuracy = 0.732:  
+[Shows model parameters, training metrics, validation metrics, test metrics]
+[Shows training accuracy curve, validation accuracy curve, training loss curve]  
+
+Model 3 - Test Accuracy = 0.739:
+[Shows model parameters, training metrics, validation metrics, test metrics]
+[Shows training accuracy curve, validation accuracy curve, training loss curve]
+
+Model 4 - Test Accuracy = 0.749: 
+[Shows model parameters, training metrics, validation metrics, test metrics]  
+[Shows training accuracy curve, validation accuracy curve, training loss curve]
+
+In addition, we performed a comparison of training run times (not test since they are very short) between the models:
+[Shows bar chart comparing training times]
+
+As expected, we can see that models 1 and 3, which ran for 50 epochs, had a training time approximately twice that of models 2 and 4. It is also interesting to see that model 4, the last one, ran longer than model 2 - we speculate that the reason is related to the fact that the number of batches in each epoch is actually doubled (batch size in model 4 is 16, half of that in model 2). It is possible that the dropout rate also has an effect on the model's training time.
+
+So far, we can summarize that model 4 has the best performance. Therefore, we will examine certain parameters of this model in depth in order to see their effects on model performance, in the hope of even improving the performance.
+
+[Shows results exploring impact of batch size, learning rate, and number of epochs on model 4]
+
+
+
