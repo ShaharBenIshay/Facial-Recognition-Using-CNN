@@ -178,7 +178,7 @@ It is important to note that we ran all the experiments on the GPU available on 
 
 Therefore, as a first step, we performed a general experiment after thinking and selecting parameters based on the results of individual runs we performed until this stage:
 
-[Table showing results of first set of 18 experiments with different hyperparameter combinations]
+<img width="516" alt="image" src="https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/317141b1-d2f3-41e4-95a6-036bea9d1071">
 
 After this general experiment, we continued to perform more focused experiments, after first narrowing down and fixing some parameters:
 
@@ -187,7 +187,7 @@ We decided to reduce the set of epoch options to [25, 50]. Our hypothesis was th
 
 At this stage, we ran an experiment that focused on finding the optimal value for the regularization coefficient from the set of options [0.0, 0.0001, 0.0005].
 
-[Table showing results of second set of 6 experiments varying regularization]
+<img width="653" alt="image" src="https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/f5a84b8d-7283-4f06-b302-5e032c0fbc2a">
 
 The best results were obtained for experiments 1, 2 and 6. We will save the parameter values of these experiments and expand on the performance of the resulting models later.
 
@@ -201,28 +201,97 @@ dropout rate = [0.0, 0.2]
 
 Also, since in the previous experiment we got similar results for 50 and 25 epochs (experiments 1 and 2 in the previous table), we decided to perform the next experiment for 25 epochs only.
 
-[Table showing results of third set of 4 experiments varying batch size and dropout]
+<img width="654" alt="image" src="https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/c74b96fa-97a5-448b-b5d3-a4fc053c66b4">
 
 First, we can see that applying dropout in this experiment at a value of 0.2 worked well (experiments 2 and 4). We were surprised to see that a batch size of 16 brought the best results in this experiment (#2). It should be noted that in previous experiments we performed (before the first general experiment), we did not identify that this batch size brings better results than batch size = 32.
 
 We will save the parameter values of experiment #2 and expand on the performance of this model later.
 
-Part 8: Results and Evaluation
+## Part 8: Results and Evaluation
 We will present the five best performing models we obtained according to the Test Accuracy results.
 
-Model 1 - Test Accuracy = 0.743:
-[Shows model parameters, training metrics, validation metrics, test metrics]
-[Shows training accuracy curve, validation accuracy curve, training loss curve]
+**Model 1 - Test Accuracy = 0.743:**
 
-Model 2 - Test Accuracy = 0.732:  
-[Shows model parameters, training metrics, validation metrics, test metrics]
-[Shows training accuracy curve, validation accuracy curve, training loss curve]  
+* Epochs: 50
+* Batch size: 32
+* Learning rate: 0.005
+* Regularization lambda: 0.0005
+* Dropout rate: 0
+* Train Time: 13.2~ minutes
+* Training Loss: 0.418
+* Validation Loss: 0.571
+* Validation Accuracy: 0.709
+* Test Time: 8.56 seconds
+* Test Loss: 25.7
 
-Model 3 - Test Accuracy = 0.739:
-[Shows model parameters, training metrics, validation metrics, test metrics]
-[Shows training accuracy curve, validation accuracy curve, training loss curve]
+<img src="https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/4358f4a7-a3ed-450b-a266-1bf48aa48c83.jpg" width="400" height="300">
+<br>
+<img src="https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/c15b4e7a-be4b-4ca0-913c-dafd275dca2f.jpg" width="400" height="300">
+<img src="https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/4ef28a54-ae92-4040-8af5-815a426c9f37.jpg" width="400" height="300">
+<br>
+<br>
+<br>
+<br>
+
+**Model 2 - Test Accuracy = 0.732:**
+
+* Epochs: 25
+* Batch size: 32
+* Learning rate: 0.005
+* Regularization lambda: 0
+* Dropout rate: 0
+* Train Time: 6.43~ minutes
+* Training Loss: 0.565
+* Validation Loss: 0.586
+* Validation Accuracy: 0.699
+* Test Time: 8.77 seconds
+* Test Loss: 26.8
+
+<img src="https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/3b20d992-e8be-47b6-b8d0-3822e85561ed.jpg" width="400" height="300">
+<br>
+<img src="https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/3b932395-3d14-4b61-a74b-8eca6ba373a6.jpg" width="400" height="300">
+<img src="https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/3895246a-e00c-4d2e-8047-a75426e91a17.jpg" width="400" height="300">
+<br>
+<br>
+<br>
+<br>
+
+**Model 3 - Test Accuracy = 0.739:**
+* Epochs: 50
+* Batch size: 32
+* Learning rate: 0.005
+* Regularization lambda: 0
+* Dropout rate: 0
+* Train Time: 13.1~ minutes
+* Training Loss: 0.48
+* Validation Loss: 0.577
+* Validation Accuracy: 0.703
+* Test Time: 8.61 seconds
+* Test Loss: 26.1
+
+<img src="https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/6d5cf68e-f971-4a8b-aaa8-5c519e687aff.jpg" width="400" height="300">
+<br>
+<img src="https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/a24dee08-2b75-44cd-aae6-26c258a1bcdf.jpg" width="400" height="300">
+<img src="https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/15fb7746-c853-4304-8207-3cbb90f68e00.jpg" width="400" height="300">
+<br>
+<br>
+<br>
+<br>
 
 Model 4 - Test Accuracy = 0.749: 
+
+	Epochs: 25
+	Batch size: 16
+	Learning rate: 0.005
+	Regularization lambda: 0
+	Dropout rate: 0.2
+	Train Time: 8.18~ minutes
+	Training Loss: 0.578
+	Validation Loss: 0.585
+	Validation Accuracy: 0.725
+	Test Time: 8.84 seconds
+	Test Loss: 25.1
+
 [Shows model parameters, training metrics, validation metrics, test metrics]  
 [Shows training accuracy curve, validation accuracy curve, training loss curve]
 
