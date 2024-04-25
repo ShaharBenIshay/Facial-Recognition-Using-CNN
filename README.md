@@ -278,31 +278,56 @@ We will present the five best performing models we obtained according to the Tes
 <br>
 <br>
 
-Model 4 - Test Accuracy = 0.749: 
+**Model 4 - Test Accuracy = 0.749:**
 
-	Epochs: 25
-	Batch size: 16
-	Learning rate: 0.005
-	Regularization lambda: 0
-	Dropout rate: 0.2
-	Train Time: 8.18~ minutes
-	Training Loss: 0.578
-	Validation Loss: 0.585
-	Validation Accuracy: 0.725
-	Test Time: 8.84 seconds
-	Test Loss: 25.1
+* Epochs: 25
+* Batch size: 16
+* Learning rate: 0.005
+* Regularization lambda: 0
+* Dropout rate: 0.2
+* Train Time: 8.18~ minutes
+* Training Loss: 0.578
+* Validation Loss: 0.585
+* Validation Accuracy: 0.725
+* Test Time: 8.84 seconds
+* Test Loss: 25.1
 
-[Shows model parameters, training metrics, validation metrics, test metrics]  
-[Shows training accuracy curve, validation accuracy curve, training loss curve]
+<img src="https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/09a8be4c-c8e6-4a91-ae06-2a87ba5e98e8.jpg" width="400" height="300">
+<br>
+<img src="https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/99c5664a-b28a-4fb6-a603-2310965e1cdc.jpg" width="400" height="300">
+<img src="https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/8986e673-406f-487e-9997-b3758f859e88.jpg" width="400" height="300">
+<br>
+<br>
+<br>
+<br>
 
-In addition, we performed a comparison of training run times (not test since they are very short) between the models:
-[Shows bar chart comparing training times]
+**In addition, we performed a comparison of training run times (not test since they are very short) between the models:**
+
+![image](https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/a04f13e7-de25-466b-81db-ae725b19201c)
 
 As expected, we can see that models 1 and 3, which ran for 50 epochs, had a training time approximately twice that of models 2 and 4. It is also interesting to see that model 4, the last one, ran longer than model 2 - we speculate that the reason is related to the fact that the number of batches in each epoch is actually doubled (batch size in model 4 is 16, half of that in model 2). It is possible that the dropout rate also has an effect on the model's training time.
 
 So far, we can summarize that model 4 has the best performance. Therefore, we will examine certain parameters of this model in depth in order to see their effects on model performance, in the hope of even improving the performance.
 
-[Shows results exploring impact of batch size, learning rate, and number of epochs on model 4]
+**Batch Size Effect:**
+
+![image](https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/2835996b-926b-46a7-97fc-ec043dc6e65f)
+
+In this experiment, we fixed all the parameters except for the batch size. We hypothesized that too small a size would lead to poorer results because in such a state there would be frequent changes in the weights, and these updates would be based on learning from a relatively small amount of data. Indeed, when running the model with a batch size of 8, we obtained a good but not optimal result. In contrast, we were surprised to get an optimal result for batch size = 64, whereas in previous runs we performed as part of the assignment, we did not get good results for this size.
+
+**Learning Rate Effect:**
+
+![image](https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/0bfd08df-1476-41a1-a283-631218ed7f7a)
+
+In this experiment, we decided to examine 4 values for the learning rate, which are divided into 2 orders of magnitude. First, we can see that the learning rate in the order of magnitude of {10}^{-2} brought better results than in the order of magnitude of {10}^{-3}. We hypothesize that the reason for this is that a learning rate that is too small makes it difficult for the model to reach the optimum - the steps are too small in each learning step.
+
+**Number of Epochs Effect:**
+
+![image](https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/0dbbd237-3b4f-43e7-8d5e-3f9ffedacee6)
+
+In this experiment, we examined the model's accuracy as a function of the number of epochs in training the model. Our hypothesis was that the more we increase the number of epochs, the better results we will get, and indeed that's what happened. However, it appears that for a doubled amount of epochs (50 versus 25), the model's improvement was minimal. We assume this is the case because the model approached overfitting, and most likely if we had continued to 75 and 100 epochs, the results may have dropped significantly since the model would not have been able to generalize well.
+
+
 
 
 
