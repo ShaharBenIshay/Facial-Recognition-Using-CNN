@@ -19,7 +19,7 @@ link to the paper: https://www.cs.cmu.edu/~rsalakhu/papers/oneshot1.pdf
 9. Conclusions
 
 ## Part 1: Data Analysis
-The raw data we received as part of the assignment is actually compressed images inside a zip file and txt files. After reading the readme file of the Labeled Faces in the Wild dataset and extracting the files, the data can be described as follows:
+The raw data we received as part of the assignment is actually compressed images inside a zip file and txt files. After reading the readme file of the Labeled Faces in the dataset and extracting the files, the data can be described as follows:
 
 - The data is actually the images, sized 250x250 pixels, so they are divided by people. Each person has one or more images, which are numbered starting from 0001 (0002, 0003 and so on).
 - The training and test sets are actually defined by the txt files.
@@ -132,7 +132,7 @@ Output: The probability of a match between the input images.
 
 Note: We wrapped all the blocks and layers with nn.Sequential.
 
-Part 4: Model Initialization
+## Part 4: Model Initialization
 Model initialization refers to two aspects: setting the random seed and initializing the weights.
 
 - In order to fix the seed, we defined a value for it in a field of the model class. In addition, we ran the setup_seeds function, which initializes all the random generators for all the packages we use in the model: torch, random, numpy random.
@@ -327,7 +327,34 @@ In this experiment, we decided to examine 4 values for the learning rate, which 
 
 In this experiment, we examined the model's accuracy as a function of the number of epochs in training the model. Our hypothesis was that the more we increase the number of epochs, the better results we will get, and indeed that's what happened. However, it appears that for a doubled amount of epochs (50 versus 25), the model's improvement was minimal. We assume this is the case because the model approached overfitting, and most likely if we had continued to 75 and 100 epochs, the results may have dropped significantly since the model would not have been able to generalize well.
 
+**Selecting the Model:**
+
+After examining parameters on model 4, we decided that it is not stable enough, as we obtained different results in additional runs of this model, so it is possible that we got a random result in the previous runs. 
+
+In summary, we decided to choose model 1, which achieved a test accuracy of 0.743, despite not achieving the best result (compared to 0.749 of model 4). We chose this as our optimal model due to the stability the model exhibited in its accuracy level over many experiments we performed, and in addition, the difference in accuracy level between it and model 4 is not significant.
+We performed an additional run for model 1, which we chose as the best model. We will present a confusion matrix for it to illustrate its results and performance:
+**Model 1 Parameters:**
+* 25 epochs
+* Batch size 32
+* Learning rate 0.005
+* Regularization coefficient 0
+* Dropout percentage 0
+
+![image](https://github.com/ShaharBenIshay/Siamese-NN-Using-One-Shot-Learning/assets/93884611/bb7a277b-7f61-42a9-9b69-94a96efaeae3)
 
 
+## Part 9: Conclusions
 
+1. We faced a complex task, and consequently, the results we obtained were not satisfactory - none of our models managed to achieve an accuracy level above 0.75. While there may be numerous reasons for this, we surmise that the primary cause is the small amount of data available for training, which constitutes the main reason for the difficulty in performing the task.
 
+2. Regarding the number of epochs, we recommend maintaining a quantity of 25 during training, unless the user has significantly more computational power available. If the user has such capability, increasing the number of epochs to 50 or even more could potentially yield better results. However, we observed that a significant increase in the number of epochs beyond 25 did not contribute substantially to improving the model's accuracy.
+
+3. Regarding the batch size, we had some deliberation on the conclusion. Ultimately, we decided to recommend a size of 32 rather than 16, despite obtaining a slightly better result with a size of 16. The reason we chose this recommendation is that we wanted a more stable and less random model. Additionally, we wanted a certain balance between the batch size and the amount of data for training, since after each batch in the training process, the weights are updated, and we would want to perform a sufficient number of updates to reach the optimum, but not perform too many updates, thus "missing" the optimum.
+
+4. During the course of our work, we observed that the learning rate could have a small value, but not too small, as the model needs to take relatively significant steps at the beginning of the learning process and progressively smaller steps over time. We managed to implement this approach using the scheduler, which decreased the learning rate every 5 epochs, allowing for a gradual approach as we neared the optimum.
+
+5. We recommend keeping the regularization coefficient at 0 or a value very close to 0. We observed that a significant increase in this coefficient's value resulted in a "random" model, and we assume that for this model, the learning process is already highly complex, and therefore, adding "difficulty" to the training caused the model to fail completely.
+
+6. We conclude that it is preferable not to use dropout for a similar reason as in conclusion 5. The model is already being trained on a complex task, so making the task even more difficult causes the model to over-generalize to the point where it is essentially not learning.
+
+7. Due to time constraints, we did not perform significant preprocessing on the input images, such as cropping or rotation. It is possible that such preprocessing could have further improved the performance of our model. Our recommendation to ourselves, had we continued to investigate this topic and develop the model, would be to start with this task.
