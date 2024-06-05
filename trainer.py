@@ -29,7 +29,7 @@ class Trainer(object):
     def __init__(self, num_epochs, batch_size, optimizer_name, learning_rate, regularization_lambda=0.0,
                  dropout_rate=0.0, validation_size=0.2, experiment_idx=0, use_gpu_flag=False, use_early_stopping=False):
 
-        self.seed = 206201667  # Shahar's ID
+        self.seed = 42  
         self.model_use_gpu = use_gpu_flag
         self.device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
         self.epochs = num_epochs
