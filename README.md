@@ -1,7 +1,5 @@
 # Siamese-NN-Using-One-Shot-Learning
 
-## Purpose of this work:
-Enabling students to experiment with building a convolutional neural net, using it on a real-world dataset and problem. In addition to practical knowledge in the “how to” of building the network, an additional goal is the integration of useful logging tools for gaining better insight into the training process. Finally, the students are expected to read, understand and (loosely) implement a scientific paper.
 
 link to the paper: https://www.cs.cmu.edu/~rsalakhu/papers/oneshot1.pdf
 
